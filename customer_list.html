@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>customer list</title>
+    <style>
+        
+
+    </style>
+</head>
+<body>
+    <form id="createCustomerForm">
+        
+        <table id="customerTable" border="1">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Street</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Delete</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody id="customerList">
+                <tr>
+                    <td>Jane</td>
+                    <td>Doe</td>
+                    <td>Elvnu Street</td>
+                    <td>H no 2</td>
+                    <td>Delhi</td>
+                    <td>Delhi</td>
+                    <td>sam@gmail.com</td>
+                    <td>12345678</td>
+                    <td><button onclick="deleteCustomer('1a2b3c4d')">Delete</button></td>
+                    <td><button onclick="updateCustomer('1a2b3c4d')">Update</button></td>
+                </tr>
+                <tr>
+                    <td>John</td>
+                    <td>Smith</td>
+                    <td>Maple Ave</td>
+                    <td>Apt 102</td>
+                    <td>New York</td>
+                    <td>NY</td>
+                    <td>john@example.com</td>
+                    <td>98765432</td>
+                    <td><button onclick="deleteCustomer('5e6f7g8h')">Delete</button></td>
+                    <td><button onclick="updateCustomer('5e6f7g8h')">Update</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+    <script>
+        // JavaScript code for loading customer list goes here
+        function loadCustomerList() {
+            const apiUrl = 'https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=get_customer_list';
+            const authToken = 'Bearer token_received_in_authentication_API_call';
+
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch customer list. Status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const customerList = document.getElementById('customerList');
+                customerList.innerHTML = '';
+
+                data.forEach(customer => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${customer.first_name}</td>
+                        <td>${customer.last_name}</td>
+                        <td>${customer.street}</td>
+                        <td>${customer.address}</td>
+                        <td>${customer.city}</td>
+                        <td>${customer.state}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.phone}</td>
+                        <td><button onclick="deleteCustomer('${customer.uuid}')">Delete</button></td>
+                        <td><button onclick="updateCustomer('${customer.uuid}')">Update</button></td>
+                    `;
+                    customerList.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function deleteCustomer(uuid) {
+            const apiUrl = 'https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp';
+            const authToken = 'Bearer token_received_in_authentication_API_call';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': authToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cmd: 'delete',
+                    uuid: uuid
+                })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    alert('Customer deleted successfully!');
+                    // Reload the customer list after deletion
+                    loadCustomerList();
+                } else if (response.status === 500) {
+                    alert('Error: Customer not deleted.');
+                } else if (response.status === 400) {
+                    alert('UUID not found.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        function updateCustomer(uuid) {
+            const apiUrl = 'https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp';
+            const authToken = 'Bearer token_received_in_authentication_API_call';
+
+            const updatedData = {
+                "first_name": "Updated Jane",
+                "last_name": "Updated Doe",
+                "street": "Updated Elvnu Street",
+                "address": "Updated H no 2 ",
+                "city": "Updated Delhi",
+                "state": "Updated Delhi",
+                "email": "updated_sam@gmail.com",
+                "phone": "9876543210"
+            };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': authToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    cmd: 'update',
+                    uuid: uuid,
+                    ...updatedData
+                })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    alert('Customer updated successfully!');
+                    // Reload the customer list after update
+                    loadCustomerList();
+                } else if (response.status === 500) {
+                    alert('Error: Customer not updated.');
+                } else if (response.status === 400) {
+                    alert('Body is empty.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        // Load customer list on page load
+        loadCustomerList();
+    </script>
+  
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Sunbase Customer Management</title>
+    <style>
+       
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+        <form id="loginForm">
+            <label for="login_id">Username:</label>
+            <input type="text" id="login_id" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+            <br>
+            <button type="submit" onclick="authenticateUser()">Login</button>
+        </form>
+ 
+
+    <script>
+        
+        function authenticateUser() {
+            const apiUrl = 'https://qa2.sunbasedata.com/sunbase/portal/api/assignment_auth.jsp';
+
+            const loginData = {
+                login_id: document.getElementById('login_id').value,
+                password: document.getElementById('password').value
+            };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Authentication failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const token = data.token;
+                console.log('Bearer Token:', token);
+            })
+            fetch('https://qa2.sunbasedata.com/sunbase/portal/api/some_other_endpoint', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Data from another endpoint:', data);
+                })
+                .catch(error => console.error(error));
+            }
+        
+    </script>
+    <p>Don't have an account? <a href="new_customer.html">Create New Customer</a></p>
+    <p>View Customer List: <a href="customer_list.html">Customer List</a></p>
+</body>
+</html>

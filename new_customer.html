@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Customer - Sunbase Customer Management</title>
+    <style>
+        /* Add your new customer page styles here */
+        
+    </style>
+</head>
+<body>
+    <h1>Create New Customer</h1>
+    <form id="createCustomerForm">
+        <!-- ... Create customer form elements ... -->
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" required>
+        <br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" required>
+        <br>
+        <label for="street">Street:</label>
+        <input type="text" id="street" required>
+        <br>
+        <label for="address">Address:</label>
+        <input type="text" id="address" required>
+        <br>
+        <label for="city">City:</label>
+        <input type="text" id="city" required>
+        <br>
+        <label for="state">State:</label>
+        <input type="text" id="state" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+        <br>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" required>
+        <br>
+        <button type="submit" onclick="createCustomer()">Create Customer</button>
+    </form>
+
+    <script>
+        // JavaScript code for creating a new customer goes here
+        function createCustomer() {
+            const apiUrl = 'https://qa2.sunbasedata.com/sunbase/portal/api/assignment.jsp?cmd=create';
+            const authToken = 'Bearer token_received_in_authentication_API_call';
+
+            const customerData = {
+                "first_name": document.getElementById('first_name').value,
+                "last_name": document.getElementById('last_name').value,
+                "street": document.getElementById('street').value,
+                "address": document.getElementById('address').value,
+                "city": document.getElementById('city').value,
+                "state": document.getElementById('state').value,
+                "email": document.getElementById('email').value,
+                "phone": document.getElementById('phone').value
+            };
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': authToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(customerData)
+            })
+            .then(response => {
+                if (response.status === 201) {
+                    alert('Customer created successfully!');
+                } else {
+                    alert('Failed to create customer. Status: ' + response.status);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred while creating the customer. ' + error.message);
+                console.error(error);
+            });
+    </script>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+    <p>View Customer List: <a href="customer_list.html">Customer List</a></p>
+</body>
+</html>
